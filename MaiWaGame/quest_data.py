@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 def get_quests():
     """คืน Dictionary ของเควสทั้งหมดในเกม"""
     quests = {
@@ -215,7 +217,6 @@ def get_quests():
             "objective": {"type": "kill", "target": "โรนินตกอับ", "count": 1},
             "reward": {"money": 50, "reputation": 20}
         },
-        # --- 15 more for capital ---
         "Q111": {
             "title": "ขโมยในตลาด", "giver_type": ["เมืองหลวง"],
             "description": "มีโจรแฝงตัวเป็นลูกค้ามาขโมยของในร้านข้า! พวกมันหนีไปทางนั้นแล้ว!",
@@ -308,3 +309,4 @@ def get_quests():
         }
     }
     return quests
+

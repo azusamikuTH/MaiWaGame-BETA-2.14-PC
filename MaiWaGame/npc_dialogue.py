@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import random
 
 def get_dialogue(location_type):

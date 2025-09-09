@@ -41,6 +41,18 @@ def get_weapons():
         "W023": { "name": "หอกสามง่ามจูมอนจิยาริ", "bonus_atk": 9, "price": 350, "sale_locations": ["โรงตีดาบ"] },
         "W024": { "name": "ดาบคาตานะชั้นดี", "bonus_atk": 9, "price": 380, "sale_locations": ["โรงตีดาบ"] },
         "W025": { "name": "ดาบยักษ์ซันบาโต", "bonus_atk": 12, "price": 550, "sale_locations": ["โรงตีดาบ"] },
+        
+        # --- NEW WEAPONS (10 เพิ่มเติม) ---
+        "W026": { "name": "ดาบโค้งอุจิกาตานะ", "bonus_atk": 8, "price": 320, "sale_locations": ["โรงตีดาบ"] },
+        "W027": { "name": "พลองเหล็กเท็ตสึโบ", "bonus_atk": 9, "price": 330, "sale_locations": ["โรงตีดาบ"] },
+        "W028": { "name": "เคียวโซ่คู่ (นิโชกามะ)", "bonus_atk": 6, "price": 240, "sale_locations": ["ตลาด"] },
+        "W029": { "name": "สนับมือเท็คโค", "bonus_atk": 3, "price": 90, "sale_locations": ["ตลาด"] },
+        "W030": { "name": "ดาบไม้ไผ่ชิไน", "bonus_atk": 1, "price": 30, "sale_locations": ["ร้านค้าเล็กๆ"] },
+        "W031": { "name": "ลูกตุ้มโซ่ฟุนโด", "bonus_atk": 4, "price": 150, "sale_locations": ["ตลาด"] },
+        "W032": { "name": "หอกยาวโออุมิยาริ", "bonus_atk": 11, "price": 450, "sale_locations": ["โรงตีดาบ"] },
+        "W033": { "name": "ดาบโคดาจิ", "bonus_atk": 6, "price": 230, "sale_locations": ["โรงตีดาบ"] },
+        "W034": { "name": "ดาบในไม้เท้า (ชิโคมิซึเอะ)", "bonus_atk": 7, "price": 380, "sale_locations": ["ตลาด"] },
+        "W035": { "name": "ดาบในตำนานมาซามุเนะ", "bonus_atk": 15, "price": 9999, "sale_locations": [] }, # Rare/Quest Item
     }
     return weapons
 
