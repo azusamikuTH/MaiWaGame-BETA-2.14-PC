@@ -96,7 +96,7 @@ class Game:
         except Exception as e: print(f"\n\n---!!! เกิดข้อผิดพลาดที่ไม่คาดคิด !!!---\nข้อความ Error: {e}\nประเภท Error: {type(e).__name__}\nเกมจะปิดตัวลง กรุณาคัดลอกข้อความด้านบนนี้เพื่อแจ้งให้ผู้พัฒนาทราบ"); input("\nกด Enter เพื่อปิดโปรแกรม..."); self.is_running = False
     
     def main_menu_phase(self):
-        clear_screen(); print("ยินดีต้อนรับสู่ MaiWa BETA 2.12 (PC)\n"); print("1. เริ่มเกมใหม่"); print("2. โหลดเกม")
+        clear_screen(); print("ยินดีต้อนรับสู่ MaiWa BETA 2.14 (PC)\n"); print("1. เริ่มเกมใหม่"); print("2. โหลดเกม")
         choice = input("เลือก: ")
         if choice == '1': self.show_intro(); self.new_game()
         elif choice == '2':
@@ -183,36 +183,48 @@ class Game:
 
     def shop_phase(self, shop_type):
         clear_screen(); print(f"--- {shop_type} ---"); greetings = { "โรงตีดาบ": "ช่างตีดาบ: \"ดาบดีๆ ช่วยรักษาชีวิตเจ้านะ... สนใจเล่มไหนล่ะ?\"", "ร้านค้าเล็กๆ": "เจ้าของร้าน: \"ยินดีต้อนรับ! ของจำเป็นสำหรับนักเดินทางอยู่ที่นี่แล้ว\"", "ตลาด": "พ่อค้า: \"ของแปลกๆ หายากๆ เชิญดูทางนี้เลย!\"" }; print(greetings.get(shop_type, "พ่อค้า: \"ยินดีต้อนรับ!\""))
-        for_sale = []
-        for w_id, w_data in self.all_weapons.items():
-            if shop_type in w_data.get("sale_locations", []): for_sale.append({'type': 'weapon', 'id': w_id, 'data': w_data})
-        for a_id, a_data in self.all_armors.items():
-            if shop_type in a_data.get("sale_locations", []): for_sale.append({'type': 'armor', 'id': a_id, 'data': a_data})
-        for i_id, i_data in self.all_items.items():
-            if shop_type in i_data.get("sale_locations", []): for_sale.append({'type': 'item', 'id': i_id, 'data': i_data})
+        potential_weapons = [item for item_id, item in self.all_weapons.items() if shop_type in item.get("sale_locations", [])]
+        potential_armors = [item for item_id, item in self.all_armors.items() if shop_type in item.get("sale_locations", [])]
+        potential_items = [item for item_id, item in self.all_items.items() if shop_type in item.get("sale_locations", [])]
 
-        if not for_sale: print("\nดูเหมือนว่าวันนี้จะไม่มีอะไรวางขายเป็นพิเศษนะ"); input("\nกด Enter เพื่อออกจากร้าน..."); self.advance_time(); return
+        daily_stock = {
+            'อาวุธ': random.sample(potential_weapons, min(5, len(potential_weapons))),
+            'ชุดเกราะ': random.sample(potential_armors, min(5, len(potential_armors))),
+            'ไอเทม': random.sample(potential_items, min(5, len(potential_items)))
+        }
+
         while True:
-            clear_screen(); print(f"--- {shop_type} ---"); print(f"เงินของคุณ: {self.player.money} มง"); print("-" * 30); print("\n--- สินค้า ---")
-            for i, item in enumerate(for_sale, 1):
-                data = item['data'];
-                if item['type'] == 'weapon': print(f"{i}. [อาวุธ] {data['name']} (ATK +{data['bonus_atk']}) - ราคา {data['price']} มง")
-                elif item['type'] == 'armor': print(f"{i}. [เกราะ] {data['name']} (DEF +{data['bonus_def']}) - ราคา {data['price']} มง")
-                elif item['type'] == 'item': print(f"{i}. [ไอเทม] {data['name']} ({data['desc']}) - ราคา {data['price']} มง")
-            print("0. ออกจากร้าน"); choice = input("เลือกสินค้าที่จะซื้อ: ")
+            clear_screen(); print(f"--- {shop_type} ---"); print(f"เงินของคุณ: {self.player.money} มง"); print("-" * 30); print("\nพ่อค้า: \"สนใจดูสินค้าประเภทไหนดี?\"")
+            categories = ["อาวุธ", "ชุดเกราะ", "ไอเทม"]
+            for i, cat in enumerate(categories, 1):
+                if daily_stock[cat]: print(f"{i}. ดูสินค้าประเภท{cat} ({len(daily_stock[cat])} ชิ้น)")
+            print("0. ออกจากร้าน"); cat_choice = input("เลือก: ")
+            if cat_choice == '0': break
+            if cat_choice.isdigit() and 1 <= int(cat_choice) <= len(categories):
+                chosen_category = categories[int(cat_choice)-1]; self.browse_and_buy(chosen_category, daily_stock[chosen_category])
+        self.advance_time()
+
+    def browse_and_buy(self, category_name, stock):
+        while True:
+            clear_screen(); print(f"--- สินค้าประเภท{category_name} ---"); print(f"เงินของคุณ: {self.player.money} มง"); print("-" * 30)
+            if not stock: print("\n- ไม่มีสินค้าประเภทนี้วางขายในวันนี้ -"); break
+            for i, item_data in enumerate(stock, 1):
+                if category_name == 'อาวุธ': print(f"{i}. {item_data['name']} (ATK +{item_data['bonus_atk']}) - ราคา {item_data['price']} มง")
+                elif category_name == 'ชุดเกราะ': print(f"{i}. {item_data['name']} (DEF +{item_data['bonus_def']}) - ราคา {item_data['price']} มง")
+                elif category_name == 'ไอเทม': print(f"{i}. {item_data['name']} ({item_data['desc']}) - ราคา {item_data['price']} มง")
+            print("0. กลับไปหน้าร้าน"); choice = input("เลือกสินค้าที่จะซื้อ: ")
             if not choice.isdigit(): continue
-            choice = int(choice);
+            choice = int(choice)
             if choice == 0: break
-            if 1 <= choice <= len(for_sale):
-                selected_item = for_sale[choice-1]; item_data = selected_item['data']
+            if 1 <= choice <= len(stock):
+                item_data = stock[choice-1]
                 if self.player.money >= item_data['price']:
                     self.player.money -= item_data['price']
-                    if selected_item['type'] == 'weapon': new_weapon = Weapon(selected_item['id'], item_data['name'], item_data['bonus_atk'], item_data['price']); self.player.weapon_inventory.append(new_weapon); print(f"\nคุณได้ซื้อ {item_data['name']}!")
-                    elif selected_item['type'] == 'armor': new_armor = Armor(selected_item['id'], item_data['name'], item_data['slot'], item_data['bonus_def'], item_data['price']); self.player.armor_inventory.append(new_armor); print(f"\nคุณได้ซื้อ {item_data['name']}!")
-                    elif selected_item['type'] == 'item': item_name = item_data['name']; self.player.item_inventory[item_name] = self.player.item_inventory.get(item_name, 0) + 1; print(f"\nคุณได้ซื้อ {item_name}!")
-                    time.sleep(1.5)
+                    if category_name == 'อาวุธ': new_weapon = Weapon(None, item_data['name'], item_data['bonus_atk'], item_data['price']); self.player.weapon_inventory.append(new_weapon)
+                    elif category_name == 'ชุดเกราะ': new_armor = Armor(None, item_data['name'], item_data['slot'], item_data['bonus_def'], item_data['price']); self.player.armor_inventory.append(new_armor)
+                    elif category_name == 'ไอเทม': self.player.item_inventory[item_data['name']] = self.player.item_inventory.get(item_data['name'], 0) + 1
+                    print(f"\nคุณได้ซื้อ {item_data['name']}!"); time.sleep(1.5); break
                 else: print("\nเงินของคุณไม่พอ..."); time.sleep(1.5)
-        self.advance_time()
 
     def dojo_phase(self):
         clear_screen(); print("--- โรงฝึก ---"); print("อาจารย์: \"วิชาดาบคือหนทางแห่งชีวิต... เจ้าสนใจจะขัดเกลาฝีมือของตนเองหรือไม่?\"")
